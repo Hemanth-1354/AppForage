@@ -591,17 +591,44 @@ export default function App() {
         )}
       </main>
 
-      <footer style={{
-        textAlign: "center", padding: "24px", color: "var(--text3)",
-        fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "1px",
-        borderTop: "1px solid var(--border)", background: "var(--surface)",
-        display: "flex", justifyContent: "center", alignItems: "center", gap: "10px",
-        textTransform: "uppercase"
-      }}>
-        <span>Forged with <span style={{ color: "var(--red)", fontSize: "14px" }}>♥</span> by HK</span>
-        <span style={{ opacity: 0.3 }}>|</span>
-        <span>AppForge System OS</span>
-      </footer>
+      <footer
+  style={{
+    textAlign: "center",
+    padding: "24px",
+    color: "var(--text3)",
+    fontFamily: "var(--font-mono)",
+    fontSize: "11px",
+    letterSpacing: "1px",
+    borderTop: "1px solid var(--border)",
+    background: "var(--surface)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "10px",
+    textTransform: "uppercase",
+    flexWrap: "wrap"
+  }}
+>
+  <span style={{ fontSize: "13px", opacity: 0.9 }}>◈</span>
+
+  <span>Intent Is The New Programming Language</span>
+
+  <span style={{ opacity: 0.3 }}>|</span>
+
+  <span>
+  Teaching Machines To Build
+  </span>
+
+  <span style={{ opacity: 0.3 }}>|</span>
+
+  <span>AppForge OS</span>
+
+  <span style={{ opacity: 0.3 }}>|</span>
+
+  <span style={{ opacity: 0.6 }}>
+    © {new Date().getFullYear()} HK
+  </span>
+</footer>
     </div>
   );
 }
