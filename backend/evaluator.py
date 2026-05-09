@@ -127,8 +127,11 @@ EVAL_PROMPTS = {
 }
 
 
-def run_evaluation(subset: Literal["real", "edge", "all"] = "all") -> dict:
-    """Run evaluation on specified prompt subset and return metrics."""
+from concurrent.futures import ThreadPoolExecutor
+import threading
+
+def run_evaluation(subset: Literal["real", "edge", "all"] = "all", max_workers: int = 4) -> dict:
+    """Run evaluation on specified prompt subset in parallel."""
     
     prompts_to_run = []
     if subset == "all":
@@ -136,7 +139,6 @@ def run_evaluation(subset: Literal["real", "edge", "all"] = "all") -> dict:
     else:
         prompts_to_run = EVAL_PROMPTS[subset]
     
-    results = []
     summary = {
         "total": len(prompts_to_run),
         "successful": 0,
@@ -148,13 +150,14 @@ def run_evaluation(subset: Literal["real", "edge", "all"] = "all") -> dict:
         "results": []
     }
     
+    lock = threading.Lock()
     total_latency = 0
     total_quality = 0
     
-    for p in prompts_to_run:
-        print(f"Evaluating {p['id']}: {p['name']}...")
+    def process_prompt(p):
+        nonlocal total_latency, total_quality
+        print(f"[EVAL] Starting {p['id']}: {p['name']}...")
         start = time.time()
-        
         try:
             result = compile_app(p["prompt"])
             latency = round((time.time() - start) * 1000)
@@ -167,6 +170,7 @@ def run_evaluation(subset: Literal["real", "edge", "all"] = "all") -> dict:
                 "quality_score": result.get("quality_score", 0),
                 "latency_ms": latency,
                 "retries": result.get("metrics", {}).get("retries", 0),
+                "metrics": result.get("metrics", {}),
                 "clarifications_needed": "clarifications_needed" in result,
                 "assumptions_made": result.get("pipeline_stages", {}).get("intent", {}).get("assumptions", []),
                 "issues_found": result.get("pipeline_stages", {}).get("refinement", {}).get("issues_found", []),
@@ -174,42 +178,43 @@ def run_evaluation(subset: Literal["real", "edge", "all"] = "all") -> dict:
                 "warnings": result.get("validation", {}).get("warnings", [])
             }
             
-            if result.get("success"):
-                summary["successful"] += 1
-            else:
-                summary["failed"] += 1
-                # Categorize failure
-                err_str = str(result.get("error", "")) + str(result.get("validation", {}).get("errors", []))
-                if "json" in err_str.lower():
-                    ftype = "json_parse_error"
-                elif "timeout" in err_str.lower():
-                    ftype = "timeout"
-                elif result.get("quality_score", 0) < 50:
-                    ftype = "low_quality"
+            with lock:
+                if result.get("success"):
+                    summary["successful"] += 1
                 else:
+                    summary["failed"] += 1
+                    err_str = str(result.get("error", "")) + str(result.get("validation", {}).get("errors", []))
                     ftype = "validation_failure"
-                summary["failure_types"][ftype] = summary["failure_types"].get(ftype, 0) + 1
-            
-            summary["total_retries"] += eval_result["retries"]
-            total_latency += latency
-            total_quality += eval_result["quality_score"]
-            results.append(eval_result)
-            
+                    if "json" in err_str.lower(): ftype = "json_parse_error"
+                    elif "timeout" in err_str.lower(): ftype = "timeout"
+                    elif result.get("quality_score", 0) < 50: ftype = "low_quality"
+                    summary["failure_types"][ftype] = summary["failure_types"].get(ftype, 0) + 1
+                
+                summary["total_retries"] += eval_result["retries"]
+                total_latency += latency
+                total_quality += eval_result["quality_score"]
+                summary["results"].append(eval_result)
+                print(f"[EVAL] Finished {p['id']} - Success: {eval_result['success']} - {latency}ms")
+                
         except Exception as e:
-            results.append({
-                "id": p["id"],
-                "name": p["name"],
-                "success": False,
-                "error": str(e),
-                "latency_ms": round((time.time() - start) * 1000)
-            })
-            summary["failed"] += 1
-            summary["failure_types"]["exception"] = summary["failure_types"].get("exception", 0) + 1
+            with lock:
+                summary["results"].append({
+                    "id": p["id"], "name": p["name"], "success": False, "error": str(e),
+                    "latency_ms": round((time.time() - start) * 1000)
+                })
+                summary["failed"] += 1
+                summary["failure_types"]["exception"] = summary["failure_types"].get("exception", 0) + 1
+
+    print(f"Running evaluation suite with {max_workers} parallel workers...")
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        executor.map(process_prompt, prompts_to_run)
     
-    summary["avg_latency_ms"] = round(total_latency / max(len(results), 1))
-    summary["avg_quality_score"] = round(total_quality / max(len(results), 1))
+    # Sort results by ID for consistency
+    summary["results"].sort(key=lambda x: x["id"])
+    
+    summary["avg_latency_ms"] = round(total_latency / max(len(summary["results"]), 1))
+    summary["avg_quality_score"] = round(total_quality / max(len(summary["results"]), 1))
     summary["success_rate_pct"] = round(summary["successful"] / max(summary["total"], 1) * 100, 1)
-    summary["results"] = results
     
     return summary
 

@@ -32,7 +32,7 @@ class EvalRequest(BaseModel):
 
 
 @app.post("/api/compile")
-async def compile_endpoint(req: CompileRequest):
+def compile_endpoint(req: CompileRequest):
     if not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty")
     if len(req.prompt) > 2000:
@@ -53,7 +53,7 @@ async def get_eval_prompts():
 
 
 @app.post("/api/evaluate")
-async def evaluate(req: EvalRequest):
+def evaluate(req: EvalRequest):
     results = run_evaluation(subset=req.subset)
     return results
 

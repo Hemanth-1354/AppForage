@@ -102,11 +102,12 @@ function JsonViewer({ data }) {
 // ── METRICS BAR ──────────────────────────────────────────────────────────────
 
 function MetricsBar({ metrics, quality }) {
+  const costStr = metrics?.total_cost ? `$${metrics.total_cost.toFixed(5)}` : "$0.00";
   const items = [
     { label: "Total Latency", value: `${metrics?.total_latency_ms || 0}ms` },
+    { label: "Est. Cost", value: costStr },
     { label: "Retries", value: metrics?.retries || 0 },
     { label: "Quality Score", value: `${quality || 0}/100` },
-    { label: "Stages", value: Object.keys(metrics?.stages || {}).length },
   ];
 
   return (
@@ -259,6 +260,10 @@ function EvalDashboard() {
               <span className="stat-label">Avg Latency</span>
             </div>
             <div className="summary-stat">
+              <span className="stat-big">${(results.results || []).reduce((sum, r) => sum + (r.metrics?.total_cost || 0), 0).toFixed(4)}</span>
+              <span className="stat-label">Total Est. Cost</span>
+            </div>
+            <div className="summary-stat">
               <span className="stat-big">{results.avg_quality_score}</span>
               <span className="stat-label">Avg Quality</span>
             </div>
@@ -273,11 +278,12 @@ function EvalDashboard() {
               <div key={r.id} className={cx("result-row", r.success ? "row-pass" : "row-fail")}>
                 <span className="result-id">{r.id}</span>
                 <span className="result-name">{r.name}</span>
-                <span className={cx("result-status", r.success ? "status-pass" : "status-fail")}>
+                <span className="result-status" style={{color: r.success ? 'var(--green)' : 'var(--red)'}}>
                   {r.success ? <IconCheck /> : <IconX />}
                 </span>
                 <span className="result-score">{r.quality_score || "—"}/100</span>
                 <span className="result-latency">{r.latency_ms}ms</span>
+                <span className="result-cost" style={{fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text3)'}}>${r.metrics?.total_cost ? r.metrics.total_cost.toFixed(5) : "0.00"}</span>
                 {r.clarifications_needed && <span className="result-tag">needs clarification</span>}
               </div>
             ))}
