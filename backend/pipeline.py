@@ -1,10 +1,3 @@
-"""
-AppForge Pipeline - Natural Language → Working App Config Compiler
-Multi-stage generation: Intent → Architecture → Schema → Refinement → Validation
-"""
-
-# ── IMPORTS ───────────────────────────────────────────────────────────────────
-
 import json
 import os
 import time
