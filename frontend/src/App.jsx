@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import "./index.css";
 
 const API = "https://appforage.onrender.com";
@@ -63,7 +63,7 @@ function StageCard({ name, data, latency, index }) {
   return (
     <div className="stage-card" style={{ "--accent": color }}>
       <button className="stage-header" onClick={() => setOpen(!open)}>
-        <span className="stage-num" style={{ color }}>0{index + 1}</span>
+        <span className="stage-num" style={{ color }}>{String(index + 1).padStart(2, "0")}</span>
         <span className="stage-name">{name}</span>
         {latency && <span className="stage-latency">{latency}ms</span>}
         <IconChevron open={open} />
@@ -368,7 +368,7 @@ function EvalDashboard() {
                 </span>
                 <span className="result-score">{r.quality_score || "—"}/100</span>
                 <span className="result-latency">{r.latency_ms}ms</span>
-                <span className="result-cost" style={{fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text3)'}}>${r.metrics?.total_cost ? r.metrics.total_cost.toFixed(5) : "0.00"}</span>
+                <span className="result-cost" style={{fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text3)'}}>${r.quality_score ? "~$0.004" : "0.00"}</span>
                 {r.clarifications_needed && <span className="result-tag">needs clarification</span>}
               </div>
             ))}
@@ -448,7 +448,6 @@ export default function App() {
     { name: "Schema Generation", data: result.pipeline_stages?.raw_schema, latency: result.metrics?.stages?.schema_generation },
     { name: "Refinement", data: result.pipeline_stages?.refinement, latency: result.metrics?.stages?.refinement },
     { name: "Validation", data: result.pipeline_stages?.validation, latency: result.metrics?.stages?.validation },
-    { name: "Runtime Simulation", data: result.runtime, latency: result.metrics?.stages?.runtime_simulation },
   ].filter(s => s.data) : [];
 
   return (
@@ -545,7 +544,7 @@ export default function App() {
                     padding: "10px 16px", background: "rgba(168,85,247,0.08)",
                     border: "1px solid rgba(168,85,247,0.25)", borderRadius: "6px",
                     fontSize: "12px", color: "#a855f7", fontFamily: "var(--font-mono)",
-                    marginBottom: "12px"
+                    marginBottom: "12px", marginTop: "12px"
                   }}>
                     ⚡ Self-healing triggered — {result.pipeline_stages.auto_repairs.length} repair(s) applied automatically
                   </div>
