@@ -160,7 +160,11 @@ function ValidationPanel({ validation }) {
           {validation.valid ? "VALID" : "INVALID"}
         </div>
         <div className="quality-ring">
-          <span className="quality-num">{score}</span>
+          <span className="quality-num" style={{
+            color: score >= 90 ? "var(--green)" : score >= 70 ? "var(--yellow)" : "var(--red)"
+          }}>
+            {score}
+          </span>
           <span className="quality-label">Quality</span>
         </div>
       </div>
@@ -368,7 +372,7 @@ function EvalDashboard() {
                 </span>
                 <span className="result-score">{r.quality_score || "—"}/100</span>
                 <span className="result-latency">{r.latency_ms}ms</span>
-                <span className="result-cost" style={{fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text3)'}}>${r.quality_score ? "~$0.004" : "0.00"}</span>
+                <span className="result-cost">${r.quality_score ? "~$0.004" : "0.00"}</span>
                 {r.clarifications_needed && <span className="result-tag">needs clarification</span>}
               </div>
             ))}

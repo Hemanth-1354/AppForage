@@ -316,7 +316,7 @@ body {
 }
 
 .eval-summary {
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   gap: 12px; margin-bottom: 24px;
 }
 .summary-stat {
@@ -350,6 +350,7 @@ body {
   border: 1px solid var(--yellow); color: var(--yellow);
   padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono);
 }
+.result-cost { font-family: var(--font-mono); font-size: 11px; color: var(--text3); min-width: 70px; }
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
 
