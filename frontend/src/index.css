@@ -365,5 +365,12 @@ body {
   .metrics-bar, .eval-summary { grid-template-columns: repeat(2, 1fr); }
   .header-inner { padding: 0 16px; }
   .main { padding: 20px 16px 60px; }
+
+/* ── ANIMATIONS ─────────────────────────────────────────────── */
+
+.heartbeat { display: inline-block; animation: heartbeat 1.5s ease-in-out infinite; }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.25); } 60% { transform: scale(1); } }
+.pulse-dot { animation: pulse-dot 2s infinite; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   .logo-tag { display: none; }
 }
