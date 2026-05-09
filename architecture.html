@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AppForge Architecture</title>
+<style>
+  body { margin: 0; background: #080c10; font-family: 'Space Mono', monospace; color: #e6edf3; padding: 40px; }
+  h1 { color: #00ff9d; font-size: 22px; margin-bottom: 8px; }
+  p { color: #8b949e; font-size: 13px; margin-bottom: 32px; }
+  .pipeline { display: flex; flex-direction: column; gap: 0; max-width: 600px; }
+  .stage { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; position: relative; }
+  .stage::after {
+    content: '↓'; position: absolute; bottom: -24px; left: 50%; transform: translateX(-50%);
+    color: #484f58; font-size: 18px; z-index: 10;
+  }
+  .stage:last-child::after { display: none; }
+  .arrow-gap { height: 28px; }
+  .stage-num { font-size: 10px; color: #6e7681; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .stage-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .stage-desc { font-size: 12px; color: #8b949e; line-height: 1.6; }
+  .output { font-size: 11px; color: #484f58; margin-top: 8px; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; margin: 2px; }
+  .s1 .stage-name { color: #00ff9d; } .s1 { border-left: 3px solid #00ff9d; }
+  .s2 .stage-name { color: #00d4ff; } .s2 { border-left: 3px solid #00d4ff; }
+  .s3 .stage-name { color: #ff6b35; } .s3 { border-left: 3px solid #ff6b35; }
+  .s4 .stage-name { color: #a855f7; } .s4 { border-left: 3px solid #a855f7; }
+  .s5 .stage-name { color: #fbbf24; } .s5 { border-left: 3px solid #fbbf24; }
+  .s6 .stage-name { color: #f85149; } .s6 { border-left: 3px solid #f85149; }
+</style>
+</head>
+<body>
+<h1>⚡ AppForge Pipeline Architecture</h1>
+<p>Natural Language → Intent → Architecture → Schema → Refinement → Validation → Execution</p>
+<div class="pipeline">
+  <div class="stage s1">
+    <div class="stage-num">Stage 1</div>
+    <div class="stage-name">Intent Extraction</div>
+    <div class="stage-desc">Parses NL into structured intermediate form. Extracts entities, features, roles. Flags ambiguities and makes documented assumptions.</div>
+    <div class="output">→ entities, features[], roles[], auth_required, assumptions[]</div>
+  </div>
+  <div class="arrow-gap"></div>
+  <div class="stage s2">
+    <div class="stage-num">Stage 2</div>
+    <div class="stage-name">Architecture Design</div>
+    <div class="stage-desc">Converts intent into full application architecture. Defines pages, API resource groups, data entities with relations, auth model.</div>
+    <div class="output">→ pages[], api_groups[], data_entities[], auth_model</div>
+  </div>
+  <div class="arrow-gap"></div>
+  <div class="stage s3">
+    <div class="stage-num">Stage 3</div>
+    <div class="stage-name">Schema Generation</div>
+    <div class="stage-desc">Generates 4 complete schemas: UI (pages, components, data bindings), API (endpoints, methods, auth), DB (tables, columns, FKs), Auth (roles, permissions, middleware).</div>
+    <div class="output">→ ui_schema + api_schema + db_schema + auth_schema</div>
+  </div>
+  <div class="arrow-gap"></div>
+  <div class="stage s4">
+    <div class="stage-num">Stage 4</div>
+    <div class="stage-name">Refinement Layer</div>
+    <div class="stage-desc">Audits cross-layer consistency: UI data_sources → API endpoints, API fields → DB columns, roles everywhere → auth schema. Applies targeted fixes.</div>
+    <div class="output">→ corrected schema + issues_found[] + fixes_applied[]</div>
+  </div>
+  <div class="arrow-gap"></div>
+  <div class="stage s5">
+    <div class="stage-num">Stage 5</div>
+    <div class="stage-name">Validation Engine</div>
+    <div class="stage-desc">Produces quality score + blocking errors + warnings + repairable list. Triggers Auto-Repair for targeted fixes without full retry.</div>
+    <div class="output">→ valid:bool, score:0-100, errors[], warnings[], repairables[]</div>
+  </div>
+  <div class="arrow-gap"></div>
+  <div class="stage s6">
+    <div class="stage-num">Runtime</div>
+    <div class="stage-name">Execution Simulator</div>
+    <div class="stage-desc">Proves output is executable: simulates DB table creation, auth token issuance, API routing, UI page rendering. Generates schema.sql + routes.js + routes.jsx.</div>
+    <div class="output">→ executable:bool + code artifacts</div>
+  </div>
+</div>
+</body>
+</html>

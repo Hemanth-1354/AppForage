@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+backend/venv/
+pip-log.txt
+.history
+.DS_Store
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.npm
+*.log
+
+# Environment / Secrets (CRITICAL)
+.env
+.env.local
+.env.*.local
+
+# AppForge Generated Artifacts
+test_output.json
+backend/schema.sql
+backend/routes.js
+backend/routes.jsx
+frontend/src/routes.jsx
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
