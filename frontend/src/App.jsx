@@ -99,6 +99,28 @@ function JsonViewer({ data }) {
   );
 }
 
+// ── SCHEMA VIEWER ────────────────────────────────────────────────────────────
+
+function SchemaViewer({ schema }) {
+  const [tab, setTab] = useState("ui_schema");
+  const tabs = ["ui_schema", "api_schema", "db_schema", "auth_schema"];
+
+  return (
+    <div className="artifacts-panel">
+      <div className="tabs">
+        {tabs.map(t => (
+          <button key={t} className={cx("tab", tab === t && "tab-active")} onClick={() => setTab(t)}>
+            {t.replace("_schema", "").toUpperCase()}
+          </button>
+        ))}
+      </div>
+      <div className="artifact-body">
+        <JsonViewer data={schema?.[tab]} />
+      </div>
+    </div>
+  );
+}
+
 // ── METRICS BAR ──────────────────────────────────────────────────────────────
 
 function MetricsBar({ metrics, quality }) {
@@ -202,6 +224,54 @@ function CodeArtifacts({ result }) {
   );
 }
 
+// ── RUNTIME PANEL ────────────────────────────────────────────────────────────
+
+function RuntimePanel({ runtime }) {
+  if (!runtime) return null;
+  const steps = runtime.simulation_steps || [];
+  const score = runtime.executability_score || 0;
+
+  return (
+    <div className="artifacts-panel">
+      <div className="artifacts-title" style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>Runtime Simulation</span>
+        <span style={{ color: score === 100 ? "var(--green)" : "var(--red)", fontFamily: "var(--font-mono)", fontSize: "13px" }}>
+          {score}/100 Executability
+        </span>
+      </div>
+      {steps.map((step, i) => (
+        <div key={i} style={{
+          display: "flex", alignItems: "flex-start", gap: "12px",
+          padding: "10px 16px", borderBottom: "1px solid var(--border)",
+          background: step.success ? "rgba(0,255,157,0.03)" : "rgba(255,80,80,0.04)"
+        }}>
+          <span style={{ color: step.success ? "var(--green)" : "var(--red)", marginTop: "1px" }}>
+            {step.success ? <IconCheck /> : <IconX />}
+          </span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: "12px", color: "var(--text)" }}>
+              {step.step}
+            </div>
+            {step.tables_created?.length > 0 && (
+              <div style={{ fontSize: "11px", color: "var(--text3)", marginTop: "3px" }}>
+                Tables: {step.tables_created.join(", ")}
+              </div>
+            )}
+            {step.routes_registered?.length > 0 && (
+              <div style={{ fontSize: "11px", color: "var(--text3)", marginTop: "3px" }}>
+                {step.routes_registered.length} routes registered
+              </div>
+            )}
+            {step.errors?.map((e, j) => (
+              <div key={j} style={{ fontSize: "11px", color: "var(--red)", marginTop: "2px" }}>→ {e}</div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── EVAL DASHBOARD ───────────────────────────────────────────────────────────
 
 function EvalDashboard() {
@@ -272,6 +342,21 @@ function EvalDashboard() {
               <span className="stat-label">Failed</span>
             </div>
           </div>
+
+          {results.failure_types && Object.keys(results.failure_types).length > 0 && (
+            <div style={{ padding: "12px 0", borderTop: "1px solid var(--border)", display: "flex", gap: "16px", marginBottom: "16px" }}>
+              <span style={{ fontSize: "11px", color: "var(--text3)" }}>Failure types:</span>
+              {Object.entries(results.failure_types).map(([type, count]) => (
+                <span key={type} style={{
+                  padding: "2px 8px", background: "rgba(255,80,80,0.1)",
+                  border: "1px solid rgba(255,80,80,0.2)", borderRadius: "4px",
+                  fontSize: "11px", color: "var(--red)", fontFamily: "var(--font-mono)"
+                }}>
+                  {type}: {count}
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="result-rows">
             {(results.results || []).map(r => (
@@ -372,7 +457,7 @@ export default function App() {
       <header className="header">
         <div className="header-inner">
           <div className="logo">
-            <span className="logo-icon"><img src="/appforge_logo.svg" alt="AppForge Logo" width="28" height="28" /></span>
+            <span className="logo-icon"><img src="/favicon.svg" alt="AppForge Logo" width="28" height="28" /></span>
             <span className="logo-text">AppForge</span>
             <span className="logo-tag">NL → App Compiler</span>
           </div>
@@ -404,7 +489,15 @@ export default function App() {
                   rows={5}
                 />
                 <div className="input-footer">
-                  <span className="input-hint">⌘ + Enter to compile</span>
+                  <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                    <span className="input-hint">⌘ + Enter to compile</span>
+                    <span style={{
+                      fontFamily: "var(--font-mono)", fontSize: "11px",
+                      color: prompt.length > 1800 ? "var(--red)" : "var(--text3)"
+                    }}>
+                      {prompt.length}/2000
+                    </span>
+                  </div>
                   <button className="compile-btn" onClick={compile} disabled={loading || !prompt.trim()}>
                     {loading ? (
                       <><span className="spinner" /> {phase || "Compiling..."}</>
@@ -446,6 +539,18 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Self-Healing Indicator */}
+                {result.pipeline_stages?.auto_repairs?.length > 0 && (
+                  <div style={{
+                    padding: "10px 16px", background: "rgba(168,85,247,0.08)",
+                    border: "1px solid rgba(168,85,247,0.25)", borderRadius: "6px",
+                    fontSize: "12px", color: "#a855f7", fontFamily: "var(--font-mono)",
+                    marginBottom: "12px"
+                  }}>
+                    ⚡ Self-healing triggered — {result.pipeline_stages.auto_repairs.length} repair(s) applied automatically
+                  </div>
+                )}
+
                 {/* Metrics */}
                 <MetricsBar metrics={result.metrics} quality={result.quality_score} />
 
@@ -463,10 +568,18 @@ export default function App() {
 
                 {/* Final Schema */}
                 <div className="section-title">Final Schema Output</div>
-                <JsonViewer data={result.schema} />
+                <SchemaViewer schema={result.schema} />
 
                 {/* Code Artifacts */}
                 {result.runtime && <CodeArtifacts result={result} />}
+
+                {/* Runtime Simulation */}
+                {result.runtime && (
+                  <>
+                    <div className="section-title">Runtime Simulation</div>
+                    <RuntimePanel runtime={result.runtime} />
+                  </>
+                )}
               </div>
             )}
           </div>
