@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./index.css";
 
-const API = "https://appforage.onrender.com/";
+const API = "https://appforage.onrender.com";
 
 // ── UTILITY ─────────────────────────────────────────────────────────────────
 
