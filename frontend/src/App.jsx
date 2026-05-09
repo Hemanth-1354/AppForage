@@ -591,7 +591,7 @@ export default function App() {
         )}
       </main>
 
-      <footer
+<footer
   style={{
     textAlign: "center",
     padding: "24px",
@@ -616,17 +616,15 @@ export default function App() {
   <span style={{ opacity: 0.3 }}>|</span>
 
   <span>
-  Teaching Machines To Build
+    AppForge{" "}
+    <span style={{ color: "var(--red)", fontSize: "13px" }}>♥</span>
+    {" "}By HK
   </span>
 
   <span style={{ opacity: 0.3 }}>|</span>
 
-  <span>AppForge OS</span>
-
-  <span style={{ opacity: 0.3 }}>|</span>
-
   <span style={{ opacity: 0.6 }}>
-    © {new Date().getFullYear()} HK
+    © 2026
   </span>
 </footer>
     </div>
