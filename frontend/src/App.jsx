@@ -461,7 +461,7 @@ export default function App() {
         <div className="header-inner">
           <div className="logo">
             <span className="logo-icon"><img src="/favicon.svg" alt="AppForge Logo" width="28" height="28" /></span>
-            <span className="logo-text">AppForge</span>
+            <span className="logo-text">AppForge<span className="logo-cursor">_</span></span>
             <span className="logo-tag">NL → App Compiler</span>
           </div>
           <nav className="nav">
@@ -590,6 +590,18 @@ export default function App() {
           <EvalDashboard />
         )}
       </main>
+
+      <footer style={{
+        textAlign: "center", padding: "24px", color: "var(--text3)",
+        fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: "1px",
+        borderTop: "1px solid var(--border)", background: "var(--surface)",
+        display: "flex", justifyContent: "center", alignItems: "center", gap: "10px",
+        textTransform: "uppercase"
+      }}>
+        <span>Forged with <span style={{ color: "var(--red)", fontSize: "14px" }}>♥</span> by HK</span>
+        <span style={{ opacity: 0.3 }}>|</span>
+        <span>AppForge System OS</span>
+      </footer>
     </div>
   );
 }
