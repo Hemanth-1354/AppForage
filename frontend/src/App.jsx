@@ -372,7 +372,7 @@ export default function App() {
       <header className="header">
         <div className="header-inner">
           <div className="logo">
-            <span className="logo-icon"><IconBolt /></span>
+            <span className="logo-icon"><img src="/appforge_logo.svg" alt="AppForge Logo" width="28" height="28" /></span>
             <span className="logo-text">AppForge</span>
             <span className="logo-tag">NL → App Compiler</span>
           </div>
